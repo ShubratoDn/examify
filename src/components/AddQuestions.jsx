@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'react-toastify'
 
 const AddQuestions = () => {
 
@@ -28,6 +29,14 @@ const AddQuestions = () => {
         const numQuestions = type === 'MCQ' ? parseInt(mcqValue, 10) : parseInt(saqValue, 10);
 
         for (let i = 0; i < numQuestions; i++) {
+            if(i === 20){
+                // handle connection refused error
+                toast.error('You can add maximum 20 inputs at a time', {
+                    position: "bottom-center",
+                    theme: "dark",
+                });
+                break;
+            }
             const newQuestion = type === 'MCQ'
                 ? {
                     type: 'MCQ',

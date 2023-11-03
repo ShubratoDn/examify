@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-const AddQuestions = () => {
+const AddQuestions = ({ handleAddQuestionSubmit, addQuestionSubmit }) => {
 
     const [questions, setQuestions] = useState([
         {
@@ -78,9 +78,34 @@ const AddQuestions = () => {
 
     //handling form submit
     const handleSubmit = (e)=>{
-        e.preventDefault();
-        
+        e.preventDefault();        
     }
+
+
+
+
+
+    useEffect(() => {
+        if (addQuestionSubmit != 1) {
+            // Check if the addQuestionSubmit flag is true, indicating the form should be submitted
+
+            // You can collect the form data here and submit it to the server
+            const formData = {
+                questions,
+                totalMarks: totalMarks.totalMarks, // Add the total marks to the form data
+            };
+
+            // Perform the form submission, e.g., using an API call
+            // Replace this with your actual form submission logic
+            // For this example, we'll just log the form data
+            console.log('Form data to be submitted:', formData);
+            handleAddQuestionSubmit(true);
+
+            // Reset the form or take any other necessary actions after submission
+            // You can clear the form or display a success message
+        }
+    }, [addQuestionSubmit]);
+
 
     return (
         <div className='add-question-component'>
@@ -228,19 +253,21 @@ const AddQuestions = () => {
                 <hr />
                 {/* Mark count section */}
                 <div>
-                    <table className='table table-bordered font-12'>
-                        <tr>
-                            <th>MCQ</th>
-                            <td>{totalMarks.mcqMarks}</td>
-                        </tr>
-                        <tr>
-                            <th>SAQ</th>
-                            <td>{totalMarks.saqMarks}</td>
-                        </tr>
-                        <tr>
-                            <th>Total</th>
-                            <td className='text-success'>{totalMarks.totalMarks}</td>
-                        </tr>
+                    <table className='table font-12'>
+                        <tbody className='p-0 table-bordered'>
+                            <tr>
+                                <th>MCQ</th>
+                                <td>{totalMarks.mcqMarks}</td>
+                            </tr>
+                            <tr>
+                                <th>SAQ</th>
+                                <td>{totalMarks.saqMarks}</td>
+                            </tr>
+                            <tr>
+                                <th>Total</th>
+                                <td className='text-success'>{totalMarks.totalMarks}</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>

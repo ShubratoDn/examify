@@ -62,7 +62,15 @@ export default function HorizontalLinearStepper() {
     // custom codes
     const [examInformationSubmit, setExamInformationSubmit] = useState(1);
     const handelExamInformationSubmit = (data) => {
-        if(data === true){
+        if (data === true) {
+            setActiveStep((prevStep) => prevStep + 1);
+        }
+    }
+
+
+    const [addQuestionSubmit, setAddQuestionSubmit] = useState(1);
+    const handleAddQuestionSubmit = (data) => {
+        if (data == true) {
             setActiveStep((prevStep) => prevStep + 1);
         }
     }
@@ -106,17 +114,26 @@ export default function HorizontalLinearStepper() {
                             // ====================================
                             // EXAM INFORMATION TAB
                             // ====================================
-                            <ExamInformation 
+                            <ExamInformation
                                 examInformationSubmit={examInformationSubmit}
                                 handelExamInformationSubmit={handelExamInformationSubmit}
                             />
+                            // <div>
+                            //     THi thi exam
+                            // </div>
                         )}
 
 
 
                         {/* Render input fields for the first step */}
                         {activeStep === 1 && (
-                            <AddQuestions/>
+                            // ====================================
+                            // ADD QUESTION TAB
+                            // ====================================
+                            <AddQuestions
+                                addQuestionSubmit={addQuestionSubmit}
+                                handleAddQuestionSubmit={handleAddQuestionSubmit}
+                            />
                         )}
                         {activeStep === 2 && (
                             <div>
@@ -127,37 +144,83 @@ export default function HorizontalLinearStepper() {
                         <React.Fragment>
                             {/* <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography> */}
                             <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
-                                <Button
+                                {(() => {
+                                    switch (activeStep) {
+                                        case 0:
+                                            return (
+                                                <Button
+                                                    color="inherit"
+                                                    disabled={activeStep === 0}                                                    
+                                                    sx={{ mr: 1 }}
+                                                >
+                                                    Back
+                                                </Button>
+                                            );
+                                        case 1:
+                                            return (
+                                                <Button
+                                                    color="inherit"
+                                                    sx={{ mr: 1 }}
+                                                    onClick={() => { setActiveStep(0); setExamInformationSubmit(1) }}
+                                                >
+                                                    Back
+                                                </Button>
+                                            );
+                                        case 2:
+                                            return (
+                                                <Button
+                                                    color="inherit"
+                                                    sx={{ mr: 1 }}
+                                                    onClick={() => { setActiveStep(1); setAddQuestionSubmit(1) }}
+                                                >
+                                                    Back
+                                                </Button>
+                                            );
+                                    }
+                                })()}
+                                {/* <Button
                                     color="inherit"
                                     disabled={activeStep === 0}
                                     onClick={handleBack}
                                     sx={{ mr: 1 }}
                                 >
                                     Back
-                                </Button>
+                                </Button> */}
                                 <Box sx={{ flex: '1 1 auto' }} />
                                 {isStepOptional(activeStep) && (
                                     <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
                                         Skip
                                     </Button>
                                 )}
-                                
-                                {/* Button mapping */}                               
-                                {(()=>{
-                                    switch (activeStep){
+
+                                {/* Button mapping */}
+                                {(() => {
+                                    switch (activeStep) {
                                         case 0:
+                                            // alert(activeStep)
                                             return (
-                                                <Button onClick={()=>{setExamInformationSubmit(prev => prev+1)}}>
+                                                // <Button onClick={() => { setExamInformationSubmit(prev => prev + 1) }}>
+                                                <Button onClick={() => { handelExamInformationSubmit(true) }}>
                                                     Next
                                                 </Button>
                                             );
                                         case 1:
+                                            // alert(activeStep)
                                             return (
-                                                <Button onClick={handleNext}>
+                                                <Button onClick={() => { setAddQuestionSubmit(prev => prev + 1) }}>
+                                                {/* <Button onClick={() => { handleAddQuestionSubmit(true) }}> */}
                                                     Next
                                                 </Button>
                                             );
                                         case 2:
+                                            // alert(activeStep)
+                                            return (
+                                                <Button onClick={handleNext}>
+                                                    Complete
+                                                </Button>
+                                            );
+                                        default:
+                                            alert("error")
                                             return (
                                                 <Button onClick={handleNext}>
                                                     Complete

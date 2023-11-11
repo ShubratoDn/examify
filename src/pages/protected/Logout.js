@@ -8,10 +8,10 @@ import { toast } from 'react-toastify'
 const Logout = () => {
     useEffect(() => {
         doLogout();
-        toast.success("Logged out successfully!", {
-            position: "bottom-center",
-            theme: "dark",
-        });
+        // toast.success("Logged out successfully!", {
+        //     position: "bottom-center",
+        //     theme: "dark",
+        // });
     }, []);
 
     return <Navigate to={"/login"}></Navigate>;

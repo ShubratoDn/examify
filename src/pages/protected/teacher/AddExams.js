@@ -209,8 +209,7 @@ export default function HorizontalLinearStepper() {
                                     switch (activeStep) {
                                         case 0:
                                             return (
-                                                // <Button onClick={() => { setExamInformationSubmit(prev => prev + 1) }}>
-                                                <Button onClick={() => { handelExamInformationSubmit(true) }}>
+                                                <Button onClick={() => { setExamInformationSubmit(prev => prev + 1) }}>
                                                     Next
                                                 </Button>
                                             );

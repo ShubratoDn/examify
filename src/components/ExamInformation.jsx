@@ -1,10 +1,16 @@
 import React, { useEffect } from 'react';
 import { useFormik } from 'formik';
+import { toast } from 'react-toastify'
 import * as Yup from 'yup';
 import userImageDemo from "../assets/img/user.png"
+import { addExamInformation } from '../services/examServices';
+import { useNavigate } from 'react-router-dom';
 
 
 const ExamInformation = ({ examInformationSubmit, handelExamInformationSubmit }) => {
+
+    const navigate = useNavigate();
+
     const formik = useFormik({
         initialValues: {
             title: '',
@@ -33,19 +39,43 @@ const ExamInformation = ({ examInformationSubmit, handelExamInformationSubmit })
                 }),
         }),
         onSubmit: (values) => {
-            // Handle form submission here
-            handelExamInformationSubmit(true);
+
+            console.log("Sending req")
+
+            addExamInformation().then((resp) => {
+                console.log(resp)
+                handelExamInformationSubmit(true);
+            }).catch(err => {
+                //if user's token is expired
+                if (err.response.data.errorType === "TokenExpired") {
+                    toast.error('Your token has been expired! Please, login again.', {
+                        position: "bottom-center",
+                        theme: "dark",
+                    });
+                    
+                    navigate("/logout")
+                    return;
+                }
+            })
         },
     });
 
 
 
     useEffect(() => {
-        if (examInformationSubmit != 1) {
-            // formik.handleSubmit();
-            handelExamInformationSubmit(true);
+        if (examInformationSubmit !== 1) {
+            formik.handleSubmit();
+            // handelExamInformationSubmit(true);
         }
     }, [examInformationSubmit])
+
+        
+    //1 key press Slow kaj kortechilo tai
+    useEffect(() => {
+        if (Object.keys(formik.touched).length > 0) {
+            formik.validateForm();
+        }
+    }, [formik.touched]);
 
 
 

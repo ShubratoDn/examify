@@ -11,6 +11,8 @@ import TeacherDashboard from '../dashboard/TeacherDashboard';
 import ExamInformation from '../../../components/ExamInformation';
 import { useState } from 'react';
 import AddQuestions from '../../../components/AddQuestions';
+import { Navigate } from 'react-router-dom';
+import ExamSchedule from '../../../components/ExamSchedule';
 
 const steps = ['Exam information', 'Add Questions', 'Exam schedule'];
 
@@ -37,9 +39,9 @@ export default function HorizontalLinearStepper() {
         setSkipped(newSkipped);
     };
 
-    const handleBack = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep - 1);
-    };
+    // const handleBack = () => {
+    //     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    // };
 
     const handleSkip = () => {
         if (!isStepOptional(activeStep)) {
@@ -70,8 +72,16 @@ export default function HorizontalLinearStepper() {
 
     const [addQuestionSubmit, setAddQuestionSubmit] = useState(1);
     const handleAddQuestionSubmit = (data) => {
-        if (data == true) {
+        if (data === true) {
             setActiveStep((prevStep) => prevStep + 1);
+        }
+    }
+
+
+    const[addExamScheduleSubmit, setExamScheduleSubmit]  = useState(1);
+    const handleExamScheduleSubmit = (data) =>{
+        if(data === true){
+            alert("Exam added")
         }
     }
 
@@ -118,9 +128,6 @@ export default function HorizontalLinearStepper() {
                                 examInformationSubmit={examInformationSubmit}
                                 handelExamInformationSubmit={handelExamInformationSubmit}
                             />
-                            // <div>
-                            //     THi thi exam
-                            // </div>
                         )}
 
 
@@ -135,10 +142,12 @@ export default function HorizontalLinearStepper() {
                                 handleAddQuestionSubmit={handleAddQuestionSubmit}
                             />
                         )}
+
                         {activeStep === 2 && (
-                            <div>
-                                This is the schedule page
-                            </div>
+                            <ExamSchedule
+                                addExamScheduleSubmit={addExamScheduleSubmit}
+                                handleExamScheduleSubmit={handleExamScheduleSubmit}
+                            />
                         )}
 
                         <React.Fragment>
@@ -150,7 +159,7 @@ export default function HorizontalLinearStepper() {
                                             return (
                                                 <Button
                                                     color="inherit"
-                                                    disabled={activeStep === 0}                                                    
+                                                    disabled={activeStep === 0}
                                                     sx={{ mr: 1 }}
                                                 >
                                                     Back
@@ -176,6 +185,8 @@ export default function HorizontalLinearStepper() {
                                                     Back
                                                 </Button>
                                             );
+                                        default:
+                                            return (<Navigate to={"/"}/>)
                                     }
                                 })()}
                                 {/* <Button
@@ -197,7 +208,6 @@ export default function HorizontalLinearStepper() {
                                 {(() => {
                                     switch (activeStep) {
                                         case 0:
-                                            // alert(activeStep)
                                             return (
                                                 // <Button onClick={() => { setExamInformationSubmit(prev => prev + 1) }}>
                                                 <Button onClick={() => { handelExamInformationSubmit(true) }}>
@@ -205,17 +215,15 @@ export default function HorizontalLinearStepper() {
                                                 </Button>
                                             );
                                         case 1:
-                                            // alert(activeStep)
                                             return (
                                                 <Button onClick={() => { setAddQuestionSubmit(prev => prev + 1) }}>
-                                                {/* <Button onClick={() => { handleAddQuestionSubmit(true) }}> */}
+                                                    {/* <Button onClick={() => { handleAddQuestionSubmit(true) }}> */}
                                                     Next
                                                 </Button>
                                             );
                                         case 2:
-                                            // alert(activeStep)
                                             return (
-                                                <Button onClick={handleNext}>
+                                                <Button onClick={ ()=>{setExamScheduleSubmit(prev=> prev+1)} }>
                                                     Complete
                                                 </Button>
                                             );

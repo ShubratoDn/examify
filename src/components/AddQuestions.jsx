@@ -212,7 +212,6 @@ const AddQuestions = ({ handleAddQuestionSubmit, addQuestionSubmit }) => {
                         </div>
                     ))}
                 </div>
-                <input type="submit" />
            </form>
 
             {/* Add button group */}

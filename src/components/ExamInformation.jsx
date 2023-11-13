@@ -1,15 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { toast } from 'react-toastify'
 import * as Yup from 'yup';
 import userImageDemo from "../assets/img/user.png"
 import { addExamInformation } from '../services/examServices';
 import { useNavigate } from 'react-router-dom';
+import { getStudentsByName } from '../services/userService';
+import { BASE_URL } from '../utils/constants';
 
 
 const ExamInformation = ({ examInformationSubmit, handelExamInformationSubmit }) => {
 
     const navigate = useNavigate();
+
+    const [studentList, setStudentList] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [examInfo, setExamInfo] = useState(null);
+    
 
     const formik = useFormik({
         initialValues: {
@@ -17,7 +24,7 @@ const ExamInformation = ({ examInformationSubmit, handelExamInformationSubmit })
             category: '',
             description: '',
             type: '',
-            selectedStudents: [], // To store selected students
+            selectedStudents: studentList, // To store selected students
         },
         validationSchema: Yup.object({
             title: Yup.string()
@@ -39,43 +46,95 @@ const ExamInformation = ({ examInformationSubmit, handelExamInformationSubmit })
                 }),
         }),
         onSubmit: (values) => {
-
-            console.log("Sending req")
-
-            addExamInformation().then((resp) => {
-                console.log(resp)
+            addExamInformation(values).then((resp) => {                
+                setExamInfo(resp.data);
                 handelExamInformationSubmit(true);
+                toast.success('Exam information added successfully', {
+                    position: "bottom-center",
+                    theme: "dark",
+                });
+
+
             }).catch(err => {
                 //if user's token is expired
                 if (err.response.data.errorType === "TokenExpired") {
                     toast.error('Your token has been expired! Please, login again.', {
                         position: "bottom-center",
                         theme: "dark",
+                        autoClose: 5000
                     });
-                    
+
                     navigate("/logout")
                     return;
+                }
+
+                if (err.response.data.messageType === "type"){
+                    toast.error(err.response.data.message, {
+                        position: "bottom-center",
+                        theme: "dark",
+                    });
                 }
             })
         },
     });
 
-
-
     useEffect(() => {
         if (examInformationSubmit !== 1) {
             formik.handleSubmit();
-            // handelExamInformationSubmit(true);
         }
     }, [examInformationSubmit])
 
-        
+
     //1 key press Slow kaj kortechilo tai
     useEffect(() => {
         if (Object.keys(formik.touched).length > 0) {
             formik.validateForm();
         }
     }, [formik.touched]);
+
+
+
+
+    //search input text
+    const [searchInput, setSearchInput] = useState("");
+    const handleSearchTextChange = async (e) => {
+        setSearchInput(e.target.value);
+        getStudentsByName(e.target.value)
+            .then(resp => {
+                setStudentList(resp.data);
+            })
+            .catch((err) => {
+                console.error(err)
+            });
+
+    };
+
+    // change starts
+    const handleCheckboxChange = (student) => {
+        const selectedStudents = formik.values.selectedStudents.includes(student)
+            ? formik.values.selectedStudents.filter((s) => s.id !== student.id)
+            : [...formik.values.selectedStudents, student];
+
+        formik.setFieldValue('selectedStudents', selectedStudents);
+    };
+
+
+    const renderSelectedStudents = () => {
+        return formik.values.selectedStudents.map((student) => (
+            <div key={student.id} className="selected-student student-search-result col-lg-4">
+                <input
+                    type="checkbox"
+                    id={`SELECTED_${student.id}`}
+                    checked={true}
+                    onChange={() => handleCheckboxChange(student)}
+                />
+                <label htmlFor={`SELECTED_${student.id}`}>
+                    {' '}
+                    <img src={BASE_URL + "UserImages/" + student.image} alt="" /> {student.name}
+                </label>
+            </div>
+        ));
+    };
 
 
 
@@ -98,6 +157,7 @@ const ExamInformation = ({ examInformationSubmit, handelExamInformationSubmit })
             <div className="input-group">
                 <label htmlFor="category">Exam category <span className='text-danger'>*</span></label>
                 <input
+                    autoComplete='off'
                     id='category'
                     name='category'
                     type='text'
@@ -146,21 +206,49 @@ const ExamInformation = ({ examInformationSubmit, handelExamInformationSubmit })
 
             {/* Only display select-student container if type is 'Specified' */}
             {formik.values.type === 'specified' && (
-                <div className='border p-3' id='select-student'>
+                <div className="border p-3" id="select-student">
                     <p>Select Students</p>
                     <div className="input-group">
-                        <input type="search" id="search_student" placeholder='Search student by name or id' />
+                        <input
+                            autoComplete='off'
+                            type="search"
+                            id="search_student"
+                            placeholder="Search student by name or id"
+                            value={searchInput}
+                            onChange={handleSearchTextChange}
+                        />
                     </div>
-                    <div id='search-student-list' className='row'>
-                        <div className="student-search-result col-lg-4 ">
-                            <input type="checkbox" name="selectedStudents" id="10" value="10" />
-                            <label htmlFor="10"> <img src={userImageDemo} alt="" /> Shubrato Debnah</label>
-                        </div>
-                        {/* ... (other student options) ... */}
+                    <div id="search-student-list" className="row">
+                        {loading ? (
+                            <p>Loading...</p>
+                        ) : (
+                            studentList.map((student) => (
+                                <div key={student.id} className="student-search-result col-lg-4">
+                                    <input
+                                        type="checkbox"
+                                        id={student.id}
+                                        checked={formik.values.selectedStudents.some((s) => s.id === student.id)}
+                                        onChange={() => handleCheckboxChange(student)}
+                                    />
+                                    <label htmlFor={student.id}>
+                                        {' '}
+                                        <img src={BASE_URL + "UserImages/" + student.image} alt="" /> {student.name}
+                                    </label>
+                                </div>
+                            ))
+                        )}
                     </div>
                     {formik.touched.selectedStudents && formik.errors.selectedStudents && (
-                        <div className='invalid-message'>{formik.errors.selectedStudents}</div>
+                        <div className="invalid-message">{formik.errors.selectedStudents}</div>
                     )}
+
+                    {/* Display selected students */}
+                    <div id="selected-students">
+                        <p className='fw-bolder'>Selected students:</p> <br></br>
+                        <div className="row">
+                            {renderSelectedStudents()}
+                        </div>
+                    </div>
                 </div>
             )}
         </form>

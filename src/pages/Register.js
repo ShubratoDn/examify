@@ -93,9 +93,9 @@ function Register() {
                         return;
                     }
 
-                    console.log(err)
+                    // console.log(err)
                     let keys = Object.keys(err.response.data)
-                    console.log(err.response.data[keys])
+                    // console.log(err.response.data[keys])
 
                     toast.error(err.response.data[keys], {
                         position: "bottom-center",

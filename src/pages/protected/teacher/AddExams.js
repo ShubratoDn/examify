@@ -39,9 +39,6 @@ export default function HorizontalLinearStepper() {
         setSkipped(newSkipped);
     };
 
-    // const handleBack = () => {
-    //     setActiveStep((prevActiveStep) => prevActiveStep - 1);
-    // };
 
     const handleSkip = () => {
         if (!isStepOptional(activeStep)) {
